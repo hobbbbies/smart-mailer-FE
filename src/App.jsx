@@ -157,6 +157,7 @@ function App() {
           email={generatedEmail}
           isVisible={showResponse}
           onClose={() => setShowResponse(false)}
+          previousPrompt={formData.descriptionPrompt}
         />
       </div>
     </main>

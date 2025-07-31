@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 
-const EmailResponse = ({ email, isVisible, onClose }) => {
+const EmailResponse = ({ email, isVisible, onClose, previousPrompt }) => {
   const [emailContent, setEmailContent] = useState(email?.body || '');
   const [isSending, setIsSending] = useState(false);
+  const [descriptionPrompt, setDescriptionPrompt] = useState('');
 
   useEffect(() => {
     setEmailContent(email?.body);
@@ -35,6 +36,38 @@ const EmailResponse = ({ email, isVisible, onClose }) => {
     } catch (error) {
       console.error('Error sending email:', error);
       alert('An error occurred while sending the email.');
+    } finally {
+      setIsSending(false);
+    }
+  }
+
+  const handleUpdateEmail = async (e) => {
+    e.preventDefault();
+    setIsSending(true);
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/email/update`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          descriptionPrompt,
+          currentBody: emailContent,
+          previousPrompt
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json()
+        setEmailContent(data.body);
+        setDescriptionPrompt(''); // Clear input after successful update
+      } else {
+        alert('Failed to update email. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error updating email:', error);
+      alert('An error occurred while updating the email.');
     } finally {
       setIsSending(false);
     }
@@ -76,7 +109,7 @@ const EmailResponse = ({ email, isVisible, onClose }) => {
                       }}
                     ></textarea>
                     <button type="submit" className="submit-btn" disabled={isSending}>
-                      {isSending ? 'Sending...' : 'Send Email'}
+                      {isSending ? 'Loading...' : 'Send Email'}
                     </button>
                 </form>
               ) : (
@@ -87,15 +120,18 @@ const EmailResponse = ({ email, isVisible, onClose }) => {
         </div>
         <div className="followup-section">
           <h3>Follow-up Query</h3>
-          <form className="followup-form">
+          <form className="followup-form" onSubmit={handleUpdateEmail}>
             <div className="form-group">
               <label htmlFor='prompt'>Additional Instructions:</label>
               <input 
                 type="text"
-                value="Make it sound more casual..." 
+                value={descriptionPrompt}
                 name="descriptionPrompt" 
                 id="prompt"
                 placeholder="e.g., Make it more formal, add urgency, shorter..."
+                onChange={(e) => {
+                    setDescriptionPrompt(e.target.value);
+                }}
               />
             </div>
             <button type="submit" className='submit-btn followup-btn'>Send Follow-up Query</button>
