@@ -1,15 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
-const EmailResponse = ({ messageHistory, setMessageHistory, isVisible, onClose, previousPrompt }) => {
+const EmailResponse = ({ responseHistory, setResponseHistory, promptHistory, setPromptHistory, isVisible, onClose }) => {
   const [isSending, setIsSending] = useState(false);
+  const [promptButtonLoading, setPromptButtonLoading] = useState(false);
   const [descriptionPrompt, setDescriptionPrompt] = useState('');
-  const [email, setEmail] = useState(null);
 
-  useEffect(() => {
-    if (messageHistory && messageHistory.length > 0) {
-      setEmail(messageHistory[messageHistory.length - 1]); // Newest generatedEmail
-    }
-  }, [messageHistory])
+  const email = responseHistory[responseHistory.length-1];
 
   const handleSendEmail = async (e) => {
     e.preventDefault();
@@ -30,7 +26,8 @@ const EmailResponse = ({ messageHistory, setMessageHistory, isVisible, onClose, 
       });
 
       if (response.ok) {
-        setMessageHistory([]);
+        setResponseHistory([]);
+        setPromptHistory([]);
         alert('Email sent successfully!');
         onClose(); // Close the email response component
       } else {
@@ -46,7 +43,7 @@ const EmailResponse = ({ messageHistory, setMessageHistory, isVisible, onClose, 
 
   const handleUpdateEmail = async (e) => {
     e.preventDefault();
-    setIsSending(true);
+    setPromptButtonLoading(true);
 
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/email/update`, {
@@ -56,14 +53,16 @@ const EmailResponse = ({ messageHistory, setMessageHistory, isVisible, onClose, 
         },
         body: JSON.stringify({
           descriptionPrompt,
-          responseHistory: messageHistory,
-          previousPrompt
+          responseHistory: responseHistory,
+          promptHistory: promptHistory,
         })
       });
 
       if (response.ok) {
         const data = await response.json()
-        setEmail({...email, body: data.body});
+        const newEmail = {...email, body: data.body};
+        setResponseHistory(prev => [...prev, newEmail]) // Add new response to history
+        setPromptHistory(prev => [...prev, descriptionPrompt]); // Add new prompt to history
         setDescriptionPrompt(''); // Clear input after successful update
       } else {
         alert('Failed to update email. Please try again.');
@@ -72,7 +71,7 @@ const EmailResponse = ({ messageHistory, setMessageHistory, isVisible, onClose, 
       console.error('Error updating email:', error);
       alert('An error occurred while updating the email.');
     } finally {
-      setIsSending(false);
+      setPromptButtonLoading(false);
     }
   }
 
@@ -107,11 +106,14 @@ const EmailResponse = ({ messageHistory, setMessageHistory, isVisible, onClose, 
                     <textarea 
                       value={email.body}
                       onChange={(e) => {
-                        setEmail({...email, body: e.target.value});
+                        const updatedEmail = {...email, body: e.target.value};
+                        const newHistory = [...responseHistory];
+                        newHistory[newHistory.length - 1] = updatedEmail;
+                        setResponseHistory(newHistory);
                       }}
                     ></textarea>
                     <button type="submit" className="submit-btn" disabled={isSending}>
-                      {isSending ? 'Loading...' : 'Send Email'}
+                      {isSending ? 'Sending...' : 'Send Email'}
                     </button>
                 </form>
               ) : (
@@ -136,7 +138,9 @@ const EmailResponse = ({ messageHistory, setMessageHistory, isVisible, onClose, 
                 }}
               />
             </div>
-            <button type="submit" className='submit-btn followup-btn'>Send Follow-up Query</button>
+            <button type="submit" className='submit-btn followup-btn' disabled={promptButtonLoading}>
+                {promptButtonLoading ? "Loading...": "Send Follow-up Query"}
+            </button>
           </form>
         </div>
       </div>

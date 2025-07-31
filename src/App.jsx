@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './App.css'
 import EmailResponse from './components/EmailResponse'
+import ToggleButtons from './components/ToggleButtons'
 
 function App() {
   const [formData, setFormData] = useState({
@@ -9,13 +10,28 @@ function App() {
     receiver: '',
     receiverName: '',
     subject: '',
-    descriptionPrompt: ''
+    descriptionPrompt: '',
+    tone: 'Professional'
   })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [generatedEmail, setGeneratedEmail] = useState(null)
   const [showResponse, setShowResponse] = useState(false)
-  const [messageHistory, setMessageHistory] = useState([]);
+  const [responseHistory, setResponseHistory] = useState([]);
+  const [promptHistory, setPromptHistory] = useState([]);
+
+  useEffect(() => {
+    if (showResponse) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+  }, [showResponse]);
+
+  const handleClose = () => {
+    setShowResponse(false); 
+    setPromptHistory([]);
+    setResponseHistory([]);
+  }
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -41,8 +57,8 @@ function App() {
       
       if (response.ok) {
         const result = await response.json()
-        setGeneratedEmail(result.email);
-        setMessageHistory(prev => [...prev, result.email]);
+        setResponseHistory(prev => [...prev, result.email]);
+        setPromptHistory(prev => [...prev, formData.descriptionPrompt]);
         setShowResponse(true);
         setFormData({
           sender: '',
@@ -60,6 +76,7 @@ function App() {
       alert('An error occurred. Please try again.')
     } finally {
       setIsSubmitting(false)
+      console.log('Tone: ', formData.tone);
     }
   }
 
@@ -145,7 +162,7 @@ function App() {
               placeholder="Describe what you want the AI to write about..."
             />
           </div>
-
+          <ToggleButtons tone={formData.tone} handleChange={handleChange}/>
           <button 
             type="submit" 
             disabled={isSubmitting}
@@ -156,10 +173,12 @@ function App() {
         </form>
 
         <EmailResponse 
-          messageHistory={messageHistory}
-          setMessageHistory={setMessageHistory}
+          responseHistory={responseHistory}
+          setResponseHistory={setResponseHistory}
+          promptHistory={promptHistory}
+          setPromptHistory={setPromptHistory}
           isVisible={showResponse}
-          onClose={() => setShowResponse(false)}
+          onClose={handleClose}
           previousPrompt={formData.descriptionPrompt}
         />
       </div>
