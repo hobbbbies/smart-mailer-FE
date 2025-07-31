@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react'
 
-const EmailResponse = ({ email, isVisible, onClose, previousPrompt }) => {
-  const [emailContent, setEmailContent] = useState(email?.body || '');
+const EmailResponse = ({ messageHistory, setMessageHistory, isVisible, onClose, previousPrompt }) => {
   const [isSending, setIsSending] = useState(false);
   const [descriptionPrompt, setDescriptionPrompt] = useState('');
+  const [email, setEmail] = useState(null);
 
   useEffect(() => {
-    setEmailContent(email?.body);
-  }, [email])
+    if (messageHistory && messageHistory.length > 0) {
+      setEmail(messageHistory[messageHistory.length - 1]); // Newest generatedEmail
+    }
+  }, [messageHistory])
 
   const handleSendEmail = async (e) => {
     e.preventDefault();
@@ -20,14 +22,15 @@ const EmailResponse = ({ email, isVisible, onClose, previousPrompt }) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          sender: email.sender,
+          senderName: email.senderName,
           receiver: email.receiver,
           subject: email.subject,
-          body: emailContent
+          body: email.body
         })
       });
 
       if (response.ok) {
+        setMessageHistory([]);
         alert('Email sent successfully!');
         onClose(); // Close the email response component
       } else {
@@ -53,14 +56,14 @@ const EmailResponse = ({ email, isVisible, onClose, previousPrompt }) => {
         },
         body: JSON.stringify({
           descriptionPrompt,
-          currentBody: emailContent,
+          responseHistory: messageHistory,
           previousPrompt
         })
       });
 
       if (response.ok) {
         const data = await response.json()
-        setEmailContent(data.body);
+        setEmail({...email, body: data.body});
         setDescriptionPrompt(''); // Clear input after successful update
       } else {
         alert('Failed to update email. Please try again.');
@@ -73,8 +76,7 @@ const EmailResponse = ({ email, isVisible, onClose, previousPrompt }) => {
     }
   }
 
-  console.log("Email Content: ", emailContent);
-  console.log("Email Body: ", email?.body)
+
   if (!isVisible || !email) return null
 
   return (
@@ -103,9 +105,9 @@ const EmailResponse = ({ email, isVisible, onClose, previousPrompt }) => {
               {email.body ? (
                 <form onSubmit={handleSendEmail}>
                     <textarea 
-                      value={emailContent}
+                      value={email.body}
                       onChange={(e) => {
-                        setEmailContent(e.target.value);
+                        setEmail({...email, body: e.target.value});
                       }}
                     ></textarea>
                     <button type="submit" className="submit-btn" disabled={isSending}>

@@ -15,6 +15,7 @@ function App() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [generatedEmail, setGeneratedEmail] = useState(null)
   const [showResponse, setShowResponse] = useState(false)
+  const [messageHistory, setMessageHistory] = useState([]);
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -41,7 +42,8 @@ function App() {
       if (response.ok) {
         const result = await response.json()
         setGeneratedEmail(result.email);
-        setShowResponse(true)
+        setMessageHistory(prev => [...prev, result.email]);
+        setShowResponse(true);
         setFormData({
           sender: '',
           senderName: '',
@@ -154,7 +156,8 @@ function App() {
         </form>
 
         <EmailResponse 
-          email={generatedEmail}
+          messageHistory={messageHistory}
+          setMessageHistory={setMessageHistory}
           isVisible={showResponse}
           onClose={() => setShowResponse(false)}
           previousPrompt={formData.descriptionPrompt}
