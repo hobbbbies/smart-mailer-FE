@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import './App.css'
 import EmailResponse from './components/EmailResponse'
 import ToggleButtons from './components/ToggleButtons'
+import { useSearchParams } from 'react-router-dom'
+import Google from './components/Google/Google'
 
 function App() {
   const [formData, setFormData] = useState({
@@ -18,6 +20,39 @@ function App() {
   const [showResponse, setShowResponse] = useState(false)
   const [responseHistory, setResponseHistory] = useState([]);
   const [promptHistory, setPromptHistory] = useState([]);
+  const [user, setUser] = useState(null);
+  
+  const [searchParams] = useSearchParams();
+  const id_token_params = searchParams.get('token');
+  const id_token = localStorage.getItem('id_token');
+
+  useEffect(() => {
+    if (id_token_params) {
+      localStorage.setItem('id_token', id_token_params);
+    }
+  }, [id_token_params]);
+
+  // Gets user from JWT 
+  useEffect(() => {
+    const handleTokenValidation = async () => {
+      if (id_token) {
+        try {
+          console.log('Token found, validating...');
+          const response = await fetch(`${import.meta.env.VITE_API_URL}/validate-token`, {
+            headers: { Authorization: `Bearer ${id_token}` }
+          });
+          if (response.ok) {
+            const userData = await response.json();
+            setUser(userData.id_token);
+          }
+        } catch (error) {
+          console.error('Token validation error:', error);
+          localStorage.removeItem('id_token');
+        }
+      }
+    };    
+    handleTokenValidation();
+  }, [id_token]);
 
   useEffect(() => {
     if (showResponse) {
@@ -44,7 +79,7 @@ function App() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setIsSubmitting(true)
-    
+
     try {
       // Replace with your actual backend endpoint
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/email`, {
@@ -83,6 +118,8 @@ function App() {
   return (
     <main>
       <div className="container">
+        {/* <button onClick={handleOauth}>Log In with google</button> */}
+        <Google user={user} />
         <h1>Smart Mailer</h1>
         <form onSubmit={handleSubmit} className="email-form">
           <div className="form-group">

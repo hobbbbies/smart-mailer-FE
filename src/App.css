@@ -40,6 +40,10 @@ textarea {
   font-size: 1rem;
   transition: border-color 0.3s ease;
   font-family: inherit;
+ 
+  /* remove when I add dark mode */
+  background-color: white;
+  color: black;
 }
 
 input:focus,

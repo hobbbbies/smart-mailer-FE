@@ -12,13 +12,13 @@ const EmailResponse = ({ responseHistory, setResponseHistory, promptHistory, set
     setIsSending(true);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/email/send`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/email/send-gmail`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          senderName: email.senderName,
+          sender: email.sender,
           receiver: email.receiver,
           subject: email.subject,
           body: email.body
