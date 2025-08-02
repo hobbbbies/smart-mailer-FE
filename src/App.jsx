@@ -4,6 +4,7 @@ import EmailResponse from './components/EmailResponse'
 import ToggleButtons from './components/ToggleButtons'
 import { useSearchParams } from 'react-router-dom'
 import Google from './components/Google/Google'
+import AccountToggle from './components/AccountToggle'
 
 function App() {
   const [formData, setFormData] = useState({
@@ -15,7 +16,7 @@ function App() {
     descriptionPrompt: '',
     tone: 'Professional'
   })
-
+  const [serviceType, setServiceType] = useState('Third Party')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showResponse, setShowResponse] = useState(false)
   const [responseHistory, setResponseHistory] = useState([]);
@@ -117,107 +118,105 @@ function App() {
 
   return (
     <main>
-      <div className="container">
-        {/* <button onClick={handleOauth}>Log In with google</button> */}
-        <Google user={user} />
-        <h1>Smart Mailer</h1>
-        <form onSubmit={handleSubmit} className="email-form">
-          <div className="form-group">
-            <label htmlFor="sender">From (Email):</label>
-            <input
-              type="email"
-              id="sender"
-              name="sender"
-              value={formData.sender}
-              onChange={handleChange}
-              required
-              placeholder="your-email@example.com"
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="senderName">From (Name):</label>
-            <input
-              type="text"
-              id="senderName"
-              name="senderName"
-              value={formData.senderName}
-              onChange={handleChange}
-              required
-              placeholder="Your Name"
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="receiver">To (Email):</label>
-            <input
-              type="email"
-              id="receiver"
-              name="receiver"
-              value={formData.receiver}
-              onChange={handleChange}
-              required
-              placeholder="recipient@example.com"
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="receiverName">To (Name):</label>
-            <input
-              type="text"
-              id="receiverName"
-              name="receiverName"
-              value={formData.receiverName}
-              onChange={handleChange}
-              required
-              placeholder="Recipient Name"
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="subject">Subject:</label>
-            <input
-              type="text"
-              id="subject"
-              name="subject"
-              value={formData.subject}
-              onChange={handleChange}
-              required
-              placeholder="Enter email subject"
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="descriptionPrompt">AI Description Prompt:</label>
-            <textarea
-              id="descriptionPrompt"
-              name="descriptionPrompt"
-              value={formData.descriptionPrompt}
-              onChange={handleChange}
-              required
-              rows="4"
-              placeholder="Describe what you want the AI to write about..."
-            />
-          </div>
-          <ToggleButtons tone={formData.tone} handleChange={handleChange}/>
-          <button 
-            type="submit" 
-            disabled={isSubmitting}
-            className="submit-btn"
-          >
-            {isSubmitting ? 'Generating...' : 'Generate Email'}
-          </button>
-        </form>
-
-        <EmailResponse 
-          responseHistory={responseHistory}
-          setResponseHistory={setResponseHistory}
-          promptHistory={promptHistory}
-          setPromptHistory={setPromptHistory}
-          isVisible={showResponse}
-          onClose={handleClose}
-          previousPrompt={formData.descriptionPrompt}
-        />
+      <div className="main-container">
+        <AccountToggle serviceType={serviceType} setServiceType={setServiceType}/>
+        <div className="container">
+          {/* <button onClick={handleOauth}>Log In with google</button> */}
+          {serviceType==="Gmail" ? <Google user={user} /> : <div><i>Emails will be sent through a third party domain</i></div>}
+          <h1>Smart Mailer</h1>
+          <form onSubmit={handleSubmit} className="email-form">
+            <div className="form-group">
+              <label htmlFor="sender">From (Email):</label>
+              <input
+                type="email"
+                id="sender"
+                name="sender"
+                value={formData.sender}
+                onChange={handleChange}
+                required
+                placeholder="your-email@example.com"
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="senderName">From (Name):</label>
+              <input
+                type="text"
+                id="senderName"
+                name="senderName"
+                value={formData.senderName}
+                onChange={handleChange}
+                required
+                placeholder="Your Name"
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="receiver">To (Email):</label>
+              <input
+                type="email"
+                id="receiver"
+                name="receiver"
+                value={formData.receiver}
+                onChange={handleChange}
+                required
+                placeholder="recipient@example.com"
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="receiverName">To (Name):</label>
+              <input
+                type="text"
+                id="receiverName"
+                name="receiverName"
+                value={formData.receiverName}
+                onChange={handleChange}
+                required
+                placeholder="Recipient Name"
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="subject">Subject:</label>
+              <input
+                type="text"
+                id="subject"
+                name="subject"
+                value={formData.subject}
+                onChange={handleChange}
+                required
+                placeholder="Enter email subject"
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="descriptionPrompt">AI Description Prompt:</label>
+              <textarea
+                id="descriptionPrompt"
+                name="descriptionPrompt"
+                value={formData.descriptionPrompt}
+                onChange={handleChange}
+                required
+                rows="4"
+                placeholder="Describe what you want the AI to write about..."
+              />
+            </div>
+            <ToggleButtons tone={formData.tone} handleChange={handleChange}/>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="submit-btn"
+            >
+              {isSubmitting ? 'Generating...' : 'Generate Email'}
+            </button>
+          </form>
+          <EmailResponse
+            responseHistory={responseHistory}
+            setResponseHistory={setResponseHistory}
+            promptHistory={promptHistory}
+            setPromptHistory={setPromptHistory}
+            isVisible={showResponse}
+            onClose={handleClose}
+            previousPrompt={formData.descriptionPrompt}
+            serviceType={serviceType}
+          />
+        </div>
       </div>
     </main>
   )

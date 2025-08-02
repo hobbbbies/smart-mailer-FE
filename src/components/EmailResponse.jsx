@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-const EmailResponse = ({ responseHistory, setResponseHistory, promptHistory, setPromptHistory, isVisible, onClose }) => {
+const EmailResponse = ({ responseHistory, setResponseHistory, promptHistory, setPromptHistory, isVisible, onClose, serviceType }) => {
   const [isSending, setIsSending] = useState(false);
   const [promptButtonLoading, setPromptButtonLoading] = useState(false);
   const [descriptionPrompt, setDescriptionPrompt] = useState('');
@@ -12,7 +12,9 @@ const EmailResponse = ({ responseHistory, setResponseHistory, promptHistory, set
     setIsSending(true);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/email/send-gmail`, {
+      let endpoint = '/send-thirdparty'
+      if (serviceType === 'Gmail') endpoint = '/send-gmail' 
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/email/${endpoint}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
