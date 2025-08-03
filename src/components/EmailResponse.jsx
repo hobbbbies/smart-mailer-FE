@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-const EmailResponse = ({ responseHistory, setResponseHistory, promptHistory, setPromptHistory, isVisible, onClose, serviceType }) => {
+const EmailResponse = ({ responseHistory, setResponseHistory, promptHistory, setPromptHistory, isVisible, onClose, serviceType, attachment }) => {
   const [isSending, setIsSending] = useState(false);
   const [promptButtonLoading, setPromptButtonLoading] = useState(false);
   const [descriptionPrompt, setDescriptionPrompt] = useState('');
@@ -12,19 +12,23 @@ const EmailResponse = ({ responseHistory, setResponseHistory, promptHistory, set
     setIsSending(true);
 
     try {
-      let endpoint = '/send-thirdparty'
-      if (serviceType === 'Gmail') endpoint = '/send-gmail' 
+      let endpoint = 'send-thirdparty'
+      if (serviceType === 'Gmail') endpoint = 'send-gmail' 
+
+      const formData = new FormData();
+      for (const [key, value] of Object.entries(email)) {
+        if (value !== null && value !== undefined) {
+          formData.append(key, value);
+        }
+      }
+      console.log("attachment: ", attachment);
+      if (attachment) {
+        formData.append('attachment', attachment);
+      }
+
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/email/${endpoint}`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          sender: email.sender,
-          receiver: email.receiver,
-          subject: email.subject,
-          body: email.body
-        })
+        body: formData
       });
 
       if (response.ok) {

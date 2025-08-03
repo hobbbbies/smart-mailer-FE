@@ -14,8 +14,9 @@ function App() {
     receiverName: '',
     subject: '',
     descriptionPrompt: '',
-    tone: 'Professional'
+    tone: 'Professional',
   })
+  const [attachment, setAttachment] = useState(null);
   const [serviceType, setServiceType] = useState('Third Party')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showResponse, setShowResponse] = useState(false)
@@ -82,7 +83,6 @@ function App() {
     setIsSubmitting(true)
 
     try {
-      // Replace with your actual backend endpoint
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/email`, {
         method: 'POST',
         headers: {
@@ -102,7 +102,7 @@ function App() {
           receiver: '',
           receiverName: '',
           subject: '',
-          descriptionPrompt: ''
+          descriptionPrompt: '',
         })
       } else {
         alert('Failed to send email. Please try again.')
@@ -114,6 +114,19 @@ function App() {
       setIsSubmitting(false)
       console.log('Tone: ', formData.tone);
     }
+  }
+
+  if (serviceType != 'Gmail') {
+    return (
+      <main>
+        <div className='main-container'>
+          <AccountToggle serviceType={serviceType} setServiceType={setServiceType}/>
+          <div className='container'>
+            <h2>Coming soon! (If I get any users)</h2>
+          </div>
+        </div>
+      </main>
+    )
   }
 
   return (
@@ -197,6 +210,16 @@ function App() {
                 placeholder="Describe what you want the AI to write about..."
               />
             </div>
+            <div className="form-group">
+              <label htmlFor="attachment">Attachment (optional):</label>
+              <input
+                type="file"
+                id="attachment"
+                name="attachment"
+                onChange={(e) => setAttachment(e.target.files[0])}
+                accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif"
+              />
+            </div>
             <ToggleButtons tone={formData.tone} handleChange={handleChange}/>
             <button
               type="submit"
@@ -215,6 +238,7 @@ function App() {
             onClose={handleClose}
             previousPrompt={formData.descriptionPrompt}
             serviceType={serviceType}
+            attachment={attachment}
           />
         </div>
       </div>
