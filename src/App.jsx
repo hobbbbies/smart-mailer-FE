@@ -16,8 +16,8 @@ function App() {
     descriptionPrompt: '',
     tone: 'Professional',
   })
-  const [attachment, setAttachment] = useState(null);
-  const [serviceType, setServiceType] = useState('Third Party')
+  const [attachments, setAttachments] = useState([]);
+  const [serviceType, setServiceType] = useState('Gmail')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showResponse, setShowResponse] = useState(false)
   const [responseHistory, setResponseHistory] = useState([]);
@@ -122,7 +122,9 @@ function App() {
         <div className='main-container'>
           <AccountToggle serviceType={serviceType} setServiceType={setServiceType}/>
           <div className='container'>
-            <h2>Coming soon! (If I get any users)</h2>
+            <h2>Coming soon!</h2>
+            <p>It's hard to find an SMPT provider that offers a good free tier... Difficult to justify 15$ a month unless I get real users.</p>
+            <p>Until then, Enjoy the gmail service! I promise I'm not going to maliciously use your gmail credentials.</p>
           </div>
         </div>
       </main>
@@ -211,13 +213,14 @@ function App() {
               />
             </div>
             <div className="form-group">
-              <label htmlFor="attachment">Attachment (optional):</label>
+              <label htmlFor="attachments">Attachments (optional):</label>
               <input
                 type="file"
-                id="attachment"
-                name="attachment"
-                onChange={(e) => setAttachment(e.target.files[0])}
+                id="attachments"
+                name="attachments"
+                onChange={(e) => setAttachments(Array.from(e.target.files))}
                 accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif"
+                multiple
               />
             </div>
             <ToggleButtons tone={formData.tone} handleChange={handleChange}/>
@@ -238,7 +241,8 @@ function App() {
             onClose={handleClose}
             previousPrompt={formData.descriptionPrompt}
             serviceType={serviceType}
-            attachment={attachment}
+            attachments={attachments}
+            setAttachments={setAttachments}
           />
         </div>
       </div>

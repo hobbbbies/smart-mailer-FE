@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-const EmailResponse = ({ responseHistory, setResponseHistory, promptHistory, setPromptHistory, isVisible, onClose, serviceType, attachment }) => {
+const EmailResponse = ({ responseHistory, setResponseHistory, promptHistory, setPromptHistory, isVisible, onClose, serviceType, attachments, setAttachments }) => {
   const [isSending, setIsSending] = useState(false);
   const [promptButtonLoading, setPromptButtonLoading] = useState(false);
   const [descriptionPrompt, setDescriptionPrompt] = useState('');
@@ -21,9 +21,12 @@ const EmailResponse = ({ responseHistory, setResponseHistory, promptHistory, set
           formData.append(key, value);
         }
       }
-      console.log("attachment: ", attachment);
-      if (attachment) {
-        formData.append('attachment', attachment);
+      console.log("attachments: ", attachments);
+      console.log('formData: ', formData);
+      if (attachments && attachments.length > 0) {
+       [ ...attachments].map((file) => {
+            formData.append(`attachments`, file);
+        });
       }
 
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/email/${endpoint}`, {
@@ -34,6 +37,7 @@ const EmailResponse = ({ responseHistory, setResponseHistory, promptHistory, set
       if (response.ok) {
         setResponseHistory([]);
         setPromptHistory([]);
+        setAttachments([]);
         alert('Email sent successfully!');
         onClose(); // Close the email response component
       } else {
