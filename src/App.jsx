@@ -226,10 +226,10 @@ function App() {
             <ToggleButtons tone={formData.tone} handleChange={handleChange}/>
             <button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || !user}
               className="submit-btn"
             >
-              {isSubmitting ? 'Generating...' : 'Generate Email'}
+              {user ? (isSubmitting ? 'Generating...' : 'Generate Email') :'Please log in first'}
             </button>
           </form>
           <EmailResponse

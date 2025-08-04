@@ -109,6 +109,7 @@ const EmailResponse = ({ responseHistory, setResponseHistory, promptHistory, set
             <p><strong>Subject:</strong> {email.subject || 'N/A'}</p>
           </div>
           <div className="email-content">
+            {[...attachments.map(file => <span>{file.currentname}</span>)]}
             <h3>Email Content:</h3>
             <div className="content-body">
               {email.body ? (
