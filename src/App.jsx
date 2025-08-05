@@ -34,6 +34,10 @@ function App() {
   useEffect(() => {
     if (id_token_params) {
       localStorage.setItem('id_token', id_token_params);
+      // Clean up the URL by removing the token parameter
+      const url = new URL(window.location);
+      url.searchParams.delete('token');
+      window.history.replaceState({}, '', url);
     }
   }, [id_token_params]);
 
@@ -98,7 +102,7 @@ function App() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({...formData, sender: user.email, senderName: user.given_name })
       })
       
       if (response.ok) {
@@ -131,15 +135,6 @@ function App() {
         </div>
       </main>
     )
-  } else if (!user) {
-    return (
-      <main>
-          <div className='main-container'>
-           <AccountToggle serviceType={serviceType} setServiceType={setServiceType}/>
-          <div className='container'></div>
-          </div>
-      </main>
-    )
   }
 
   return (
@@ -149,7 +144,7 @@ function App() {
           <AccountToggle serviceType={serviceType} setServiceType={setServiceType}/>
           <div className="container">
             {/* <button onClick={handleOauth}>Log In with google</button> */}
-            {serviceType==="Gmail" ? <Google user={user} /> : <div><i>Emails will be sent through a third party domain</i></div>}
+            {serviceType==="Gmail" ? <Google user={user} setUser={setUser} /> : <div><i>Emails will be sent through a third party domain</i></div>}
             <h1>Smart Mailer</h1>
             <form onSubmit={handleSubmit} className="email-form">
             <div className="form-group">

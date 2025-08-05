@@ -1,4 +1,4 @@
-export default function Google({ user }) {
+export default function Google({ user, setUser }) {
 
     const handleOAuth = () => {
         const id_token = localStorage.getItem('id_token');
@@ -9,11 +9,17 @@ export default function Google({ user }) {
         }
     }
 
+    const handleLogout = () => {
+      setUser(null);
+      localStorage.removeItem('id_token');
+    }
+
     return (
         <div className="google">
           {!user && <button onClick={handleOAuth}>Sign in with Google</button>}
           {user && < div className='user-info'>
-            Logged in as: <b>{user.email}</b>
+            <button onClick={handleLogout}>Log Out</button>
+            <div>Logged in as: <b>{user.email}</b></div>
             <div className='warning'>NOTE: Emails will be sent on your behalf</div>
           </div>}
         </div>
