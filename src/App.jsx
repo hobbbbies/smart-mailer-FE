@@ -5,6 +5,7 @@ import ToggleButtons from './components/ToggleButtons'
 import { useSearchParams } from 'react-router-dom'
 import Google from './components/Google/Google'
 import AccountToggle from './components/AccountToggle'
+import { UserProvider } from './contexts/UserContext'
 
 function App() {
   const [formData, setFormData] = useState({
@@ -23,7 +24,7 @@ function App() {
   const [responseHistory, setResponseHistory] = useState([]);
   const [promptHistory, setPromptHistory] = useState([]);
   const [user, setUser] = useState(null);
-  
+
   const fileInputRef = useRef(null);
   
   const [searchParams] = useSearchParams();
@@ -105,14 +106,6 @@ function App() {
         setResponseHistory(prev => [...prev, result.email]);
         setPromptHistory(prev => [...prev, formData.descriptionPrompt]);
         setShowResponse(true);
-        setFormData({
-          sender: '',
-          senderName: '',
-          receiver: '',
-          receiverName: '',
-          subject: '',
-          descriptionPrompt: '',
-        })
       } else {
         alert('Failed to send email. Please try again.')
       }
@@ -138,41 +131,27 @@ function App() {
         </div>
       </main>
     )
+  } else if (!user) {
+    return (
+      <main>
+          <div className='main-container'>
+           <AccountToggle serviceType={serviceType} setServiceType={setServiceType}/>
+          <div className='container'></div>
+          </div>
+      </main>
+    )
   }
 
   return (
-    <main>
-      <div className="main-container">
-        <AccountToggle serviceType={serviceType} setServiceType={setServiceType}/>
-        <div className="container">
-          {/* <button onClick={handleOauth}>Log In with google</button> */}
-          {serviceType==="Gmail" ? <Google user={user} /> : <div><i>Emails will be sent through a third party domain</i></div>}
-          <h1>Smart Mailer</h1>
-          <form onSubmit={handleSubmit} className="email-form">
-            <div className="form-group">
-              <label htmlFor="sender">From (Email):</label>
-              <input
-                type="email"
-                id="sender"
-                name="sender"
-                value={formData.sender}
-                onChange={handleChange}
-                required
-                placeholder="your-email@example.com"
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="senderName">From (Name):</label>
-              <input
-                type="text"
-                id="senderName"
-                name="senderName"
-                value={formData.senderName}
-                onChange={handleChange}
-                required
-                placeholder="Your Name"
-              />
-            </div>
+    <UserProvider user={user}>
+      <main>
+        <div className="main-container">
+          <AccountToggle serviceType={serviceType} setServiceType={setServiceType}/>
+          <div className="container">
+            {/* <button onClick={handleOauth}>Log In with google</button> */}
+            {serviceType==="Gmail" ? <Google user={user} /> : <div><i>Emails will be sent through a third party domain</i></div>}
+            <h1>Smart Mailer</h1>
+            <form onSubmit={handleSubmit} className="email-form">
             <div className="form-group">
               <label htmlFor="receiver">To (Email):</label>
               <input
@@ -253,10 +232,12 @@ function App() {
             serviceType={serviceType}
             attachments={attachments}
             setAttachments={setAttachments}
+            setFormData={setFormData}
           />
         </div>
       </div>
     </main>
+    </UserProvider>
   )
 }
 

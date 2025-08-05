@@ -1,9 +1,11 @@
 import { useState } from 'react'
+import { useUser } from '../contexts/UserContext'
 
-const EmailResponse = ({ responseHistory, setResponseHistory, promptHistory, setPromptHistory, isVisible, onClose, serviceType, attachments, setAttachments }) => {
+const EmailResponse = ({ responseHistory, setResponseHistory, promptHistory, setPromptHistory, isVisible, onClose, serviceType, attachments, setAttachments, setFormData }) => {
   const [isSending, setIsSending] = useState(false);
   const [promptButtonLoading, setPromptButtonLoading] = useState(false);
   const [descriptionPrompt, setDescriptionPrompt] = useState('');
+  const user = useUser();
 
   const email = responseHistory[responseHistory.length-1];
 
@@ -16,28 +18,39 @@ const EmailResponse = ({ responseHistory, setResponseHistory, promptHistory, set
       if (serviceType === 'Gmail') endpoint = 'send-gmail' 
 
       const formData = new FormData();
-      for (const [key, value] of Object.entries(email)) {
+      // Replace sender with user.email for FormData
+      const emailData = { ...email };
+      if (user?.email) {
+        emailData.sender = user.email;
+        emailData.senderName = user.given_name;
+      }
+      
+      for (const [key, value] of Object.entries(emailData)) {
         if (value !== null && value !== undefined) {
           formData.append(key, value);
         }
       }
-      console.log("attachments: ", attachments);
-      console.log('formData: ', formData);
       if (attachments && attachments.length > 0) {
        [ ...attachments].map((file) => {
             formData.append(`attachments`, file);
         });
       }
-
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/email/${endpoint}`, {
         method: 'POST',
         body: formData
       });
-
       if (response.ok) {
         setResponseHistory([]);
         setPromptHistory([]);
         setAttachments([]);
+         // Reset form data but preserve tone
+        setFormData(prev => ({
+          receiver: '',
+          receiverName: '',
+          subject: '',
+          descriptionPrompt: '',
+          tone: prev.tone,
+        }));
         alert('Email sent successfully!');
         onClose(); // Close the email response component
       } else {
@@ -87,7 +100,6 @@ const EmailResponse = ({ responseHistory, setResponseHistory, promptHistory, set
 
 
   if (!isVisible || !email) return null
-
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="email-response" onClick={(e) => e.stopPropagation()}>
@@ -104,7 +116,7 @@ const EmailResponse = ({ responseHistory, setResponseHistory, promptHistory, set
         </div>
         <div className="email-preview">
           <div className="email-meta">
-            <p><strong>From:</strong> {email.sender || 'N/A'}</p>
+            <p><strong>From:</strong> {user?.email || 'N/A'}</p>
             <p><strong>To:</strong> {email.receiver || 'N/A'}</p>
             <p><strong>Subject:</strong> {email.subject || 'N/A'}</p>
           </div>
