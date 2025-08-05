@@ -1,4 +1,4 @@
-export default function Google({ user, setUser }) {
+export default function Google({ user, setUser, denied }) {
 
     const handleOAuth = () => {
         const id_token = localStorage.getItem('id_token');
@@ -17,6 +17,7 @@ export default function Google({ user, setUser }) {
     return (
         <div className="google">
           {!user && <button onClick={handleOAuth}>Sign in with Google</button>}
+          {denied && <span className="warning">User didn't allow send email permissions; App won't work. Please sign in again.</span>}
           {user && < div className='user-info'>
             <button onClick={handleLogout}>Log Out</button>
             <div>Logged in as: <b>{user.email}</b></div>

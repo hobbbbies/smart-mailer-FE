@@ -29,15 +29,23 @@ function App() {
   
   const [searchParams] = useSearchParams();
   const id_token_params = searchParams.get('token');
-  const id_token = localStorage.getItem('id_token');
+  const denied = searchParams.get('denied');
+  const [id_token, setId_token] = useState(null);
 
   useEffect(() => {
     if (id_token_params) {
       localStorage.setItem('id_token', id_token_params);
+      setId_token(id_token_params);      
       // Clean up the URL by removing the token parameter
       const url = new URL(window.location);
       url.searchParams.delete('token');
       window.history.replaceState({}, '', url);
+    } else {
+      // Check if token exists in localStorage on initial load
+      const storedToken = localStorage.getItem('id_token');
+      if (storedToken) {
+        setId_token(storedToken);
+      }
     }
   }, [id_token_params]);
 
@@ -46,7 +54,6 @@ function App() {
     const handleTokenValidation = async () => {
       if (id_token) {
         try {
-          console.log('Token found, validating...');
           const response = await fetch(`${import.meta.env.VITE_API_URL}/validate-token`, {
             headers: { Authorization: `Bearer ${id_token}` }
           });
@@ -71,9 +78,9 @@ function App() {
     }
   }, [showResponse]);
 
-  // Reset file input when attachments is cleared
+  // Reset file input when attachments change to allow adding more files
   useEffect(() => {
-    if (attachments.length === 0 && fileInputRef.current) {
+    if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
   }, [attachments]);
@@ -118,7 +125,6 @@ function App() {
       alert('An error occurred. Please try again.')
     } finally {
       setIsSubmitting(false)
-      console.log('Tone: ', formData.tone);
     }
   }
 
@@ -137,6 +143,7 @@ function App() {
     )
   }
 
+
   return (
     <UserProvider user={user}>
       <main>
@@ -144,7 +151,7 @@ function App() {
           <AccountToggle serviceType={serviceType} setServiceType={setServiceType}/>
           <div className="container">
             {/* <button onClick={handleOauth}>Log In with google</button> */}
-            {serviceType==="Gmail" ? <Google user={user} setUser={setUser} /> : <div><i>Emails will be sent through a third party domain</i></div>}
+            {serviceType==="Gmail" ? <Google user={user} setUser={setUser} denied={denied} /> : <div><i>Emails will be sent through a third party domain</i></div>}
             <h1>Smart Mailer</h1>
             <form onSubmit={handleSubmit} className="email-form">
             <div className="form-group">
@@ -202,10 +209,34 @@ function App() {
                 id="attachments"
                 name="attachments"
                 ref={fileInputRef}
-                onChange={(e) => setAttachments(Array.from(e.target.files))}
+                onChange={(e) => {
+                  const newFiles = Array.from(e.target.files);
+                  setAttachments(prev => [...prev, ...newFiles]);
+                }}
                 accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif"
                 multiple
               />
+              {attachments.length > 0 && (
+                <div className="selected-files">
+                  <h4>Selected Files:</h4>
+                  <ul>
+                    {attachments.map((file, index) => (
+                      <li key={index} className="file-item">
+                        <span>{file.name} ({(file.size / 1024).toFixed(1)}KB)</span>
+                        <button 
+                          type="button" 
+                          onClick={() => {
+                            setAttachments(prev => prev.filter((_, i) => i !== index));
+                          }}
+                          className="remove-file-btn"
+                        >
+                          ✕
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
             <ToggleButtons tone={formData.tone} handleChange={handleChange}/>
             <button
