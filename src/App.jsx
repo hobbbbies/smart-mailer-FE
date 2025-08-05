@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import './App.css'
 import EmailResponse from './components/EmailResponse'
 import ToggleButtons from './components/ToggleButtons'
@@ -23,6 +23,8 @@ function App() {
   const [responseHistory, setResponseHistory] = useState([]);
   const [promptHistory, setPromptHistory] = useState([]);
   const [user, setUser] = useState(null);
+  
+  const fileInputRef = useRef(null);
   
   const [searchParams] = useSearchParams();
   const id_token_params = searchParams.get('token');
@@ -63,6 +65,13 @@ function App() {
       document.body.style.overflow = 'unset';
     }
   }, [showResponse]);
+
+  // Reset file input when attachments is cleared
+  useEffect(() => {
+    if (attachments.length === 0 && fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  }, [attachments]);
 
   const handleClose = () => {
     setShowResponse(false); 
@@ -218,6 +227,7 @@ function App() {
                 type="file"
                 id="attachments"
                 name="attachments"
+                ref={fileInputRef}
                 onChange={(e) => setAttachments(Array.from(e.target.files))}
                 accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif"
                 multiple

@@ -109,7 +109,7 @@ const EmailResponse = ({ responseHistory, setResponseHistory, promptHistory, set
             <p><strong>Subject:</strong> {email.subject || 'N/A'}</p>
           </div>
           <div className="email-content">
-            {[...attachments.map(file => <span>{file.currentname}</span>)]}
+            {console.log('attachments: ', attachments)}
             <h3>Email Content:</h3>
             <div className="content-body">
               {email.body ? (
@@ -131,6 +131,11 @@ const EmailResponse = ({ responseHistory, setResponseHistory, promptHistory, set
                 <p>No email content available</p>
               )}
             </div>
+            {attachments && <div className='attachments'>Attachments:
+             <ul>
+              {[...attachments].map(file => <li>{file.name}</li>)
+              }</ul>
+            </div>}
           </div>
         </div>
         <div className="followup-section">

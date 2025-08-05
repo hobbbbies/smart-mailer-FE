@@ -319,3 +319,7 @@ textarea {
   width: 100% !important;
   display: flex !important;
 }
+
+.attachments {
+  padding-top: 16px;
+}
