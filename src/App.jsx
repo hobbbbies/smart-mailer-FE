@@ -103,6 +103,8 @@ function App() {
     e.preventDefault()
     setIsSubmitting(true)
 
+    console.log('serivceType: ', serviceType);
+    console.log('formData: ', formData);
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/email`, {
         method: 'POST',
@@ -111,7 +113,9 @@ function App() {
         },
         body: JSON.stringify({...formData,
            sender: serviceType === 'Gmail' ?  user.email : formData.sender,
-           senderName: serviceType === 'Gmail' ?  user.given_name : formData.senderName })
+           senderName: serviceType === 'Gmail' ?  user.given_name : formData.senderName,
+           receiver: serviceType === 'Gmail' ? formData.receiver : 'stefankkvitanov@gmail.com'  
+           })
       })
       
       if (response.ok) {
@@ -153,7 +157,7 @@ function App() {
           <AccountToggle serviceType={serviceType} setServiceType={setServiceType}/>
           <div className="container">
             {/* <button onClick={handleOauth}>Log In with google</button> */}
-            {serviceType==="Gmail" ? <Google user={user} setUser={setUser} denied={denied} /> : <div><i>Emails will be sent through a third party domain</i></div>}
+            {serviceType==="Gmail" ? <Google user={user} setUser={setUser} denied={denied} /> : <div><i>Emails will be sent through a third party domain<br></br> <strong>NOTE: Third party emails are currently demo mode - only emails to stefankkvitanov@gmail.com will work</strong>. </i></div>}
             <h1>Smart Mailer</h1>
             <form onSubmit={handleSubmit} className="email-form">
              {serviceType !== 'Gmail' && (
@@ -190,8 +194,8 @@ function App() {
                   type="email"
                   id="receiver"
                   name="receiver"
-                  value={formData.receiver}
-                  onChange={handleChange}
+                  value={serviceType === 'Gmail' ? formData.receiver : 'stefankkvitanov@gmail.com'}
+                  onChange={serviceType === 'Gmail' ? handleChange : () => {}}
                   required
                   placeholder="recipient@example.com"
                 />

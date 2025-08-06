@@ -16,17 +16,9 @@ const EmailResponse = ({ responseHistory, setResponseHistory, promptHistory, set
     try {
       let endpoint = 'send-third-party'
       if (serviceType === 'Gmail') endpoint = 'send-gmail' 
-
       const formData = new FormData();
       // Replace sender with user.email for FormData
       const emailData = { ...email };
-      // if (serviceType === 'Gmail' && user?.email) {
-      //   emailData.sender = user.email;
-      //   emailData.senderName = user.given_name;
-      // } else {
-      //   emailData.sender = 
-      // }
-      
       console.log('sender: ', email.sender);
       for (const [key, value] of Object.entries(emailData)) {
         if (value !== null && value !== undefined) {
@@ -38,6 +30,7 @@ const EmailResponse = ({ responseHistory, setResponseHistory, promptHistory, set
             formData.append(`attachments`, file);
         });
       }
+
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/email/${endpoint}`, {
         method: 'POST',
         body: formData
@@ -48,6 +41,8 @@ const EmailResponse = ({ responseHistory, setResponseHistory, promptHistory, set
         setAttachments([]);
          // Reset form data but preserve tone
         setFormData(prev => ({
+          sender: '',
+          senderName: '',
           receiver: '',
           receiverName: '',
           subject: '',
