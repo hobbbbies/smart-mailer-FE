@@ -109,7 +109,9 @@ function App() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({...formData, sender: user.email, senderName: user.given_name })
+        body: JSON.stringify({...formData,
+           sender: serviceType === 'Gmail' ?  user.email : formData.sender,
+           senderName: serviceType === 'Gmail' ?  user.given_name : formData.senderName })
       })
       
       if (response.ok) {
@@ -154,98 +156,126 @@ function App() {
             {serviceType==="Gmail" ? <Google user={user} setUser={setUser} denied={denied} /> : <div><i>Emails will be sent through a third party domain</i></div>}
             <h1>Smart Mailer</h1>
             <form onSubmit={handleSubmit} className="email-form">
-            <div className="form-group">
-              <label htmlFor="receiver">To (Email):</label>
-              <input
-                type="email"
-                id="receiver"
-                name="receiver"
-                value={formData.receiver}
-                onChange={handleChange}
-                required
-                placeholder="recipient@example.com"
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="receiverName">To (Name):</label>
-              <input
-                type="text"
-                id="receiverName"
-                name="receiverName"
-                value={formData.receiverName}
-                onChange={handleChange}
-                required
-                placeholder="Recipient Name"
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="subject">Subject:</label>
-              <input
-                type="text"
-                id="subject"
-                name="subject"
-                value={formData.subject}
-                onChange={handleChange}
-                required
-                placeholder="Enter email subject"
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="descriptionPrompt">AI Description Prompt:</label>
-              <textarea
-                id="descriptionPrompt"
-                name="descriptionPrompt"
-                value={formData.descriptionPrompt}
-                onChange={handleChange}
-                required
-                rows="4"
-                placeholder="Describe what you want the AI to write about..."
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="attachments">Attachments (optional):</label>
-              <input
-                type="file"
-                id="attachments"
-                name="attachments"
-                ref={fileInputRef}
-                onChange={(e) => {
-                  const newFiles = Array.from(e.target.files);
-                  setAttachments(prev => [...prev, ...newFiles]);
-                }}
-                accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif"
-                multiple
-              />
-              {attachments.length > 0 && (
-                <div className="selected-files">
-                  <h4>Selected Files:</h4>
-                  <ul>
-                    {attachments.map((file, index) => (
-                      <li key={index} className="file-item">
-                        <span>{file.name} ({(file.size / 1024).toFixed(1)}KB)</span>
-                        <button 
-                          type="button" 
-                          onClick={() => {
-                            setAttachments(prev => prev.filter((_, i) => i !== index));
-                          }}
-                          className="remove-file-btn"
-                        >
-                          ✕
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-            <ToggleButtons tone={formData.tone} handleChange={handleChange}/>
-            <button
-              type="submit"
-              disabled={isSubmitting || !user}
-              className="submit-btn"
-            >
-              {user ? (isSubmitting ? 'Generating...' : 'Generate Email') :'Please log in first'}
-            </button>
+             {serviceType !== 'Gmail' && (
+               <>
+                 <div className="form-group">
+                   <label htmlFor="sender">From (Email):</label>
+                   <input
+                     type="email"
+                     id="sender"
+                     name="sender"
+                     value={formData.sender}
+                     onChange={handleChange}
+                     required
+                     placeholder="your-email@example.com"
+                   />
+                 </div>
+                 <div className="form-group">
+                   <label htmlFor="senderName">From (Name):</label>
+                   <input
+                     type="text"
+                     id="senderName"
+                     name="senderName"
+                     value={formData.senderName}
+                     onChange={handleChange}
+                     required
+                     placeholder="Your Name"
+                   />
+                 </div>
+               </>
+             )}
+              <div className="form-group">
+                <label htmlFor="receiver">To (Email):</label>
+                <input
+                  type="email"
+                  id="receiver"
+                  name="receiver"
+                  value={formData.receiver}
+                  onChange={handleChange}
+                  required
+                  placeholder="recipient@example.com"
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="receiverName">To (Name):</label>
+                <input
+                  type="text"
+                  id="receiverName"
+                  name="receiverName"
+                  value={formData.receiverName}
+                  onChange={handleChange}
+                  required
+                  placeholder="Recipient Name"
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="subject">Subject:</label>
+                <input
+                  type="text"
+                  id="subject"
+                  name="subject"
+                  value={formData.subject}
+                  onChange={handleChange}
+                  required
+                  placeholder="Enter email subject"
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="descriptionPrompt">AI Description Prompt:</label>
+                <textarea
+                  id="descriptionPrompt"
+                  name="descriptionPrompt"
+                  value={formData.descriptionPrompt}
+                  onChange={handleChange}
+                  required
+                  rows="4"
+                  placeholder="Describe what you want the AI to write about..."
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="attachments">Attachments (optional):</label>
+                <input
+                  type="file"
+                  id="attachments"
+                  name="attachments"
+                  ref={fileInputRef}
+                  onChange={(e) => {
+                    const newFiles = Array.from(e.target.files);
+                    setAttachments(prev => [...prev, ...newFiles]);
+                  }}
+                  accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif"
+                  multiple
+                />
+                {attachments.length > 0 && (
+                  <div className="selected-files">
+                    <h4>Selected Files:</h4>
+                    <ul>
+                      {attachments.map((file, index) => (
+                        <li key={index} className="file-item">
+                          <span>{file.name} ({(file.size / 1024).toFixed(1)}KB)</span>
+                          <button 
+                            type="button" 
+                            onClick={() => {
+                              setAttachments(prev => prev.filter((_, i) => i !== index));
+                            }}
+                            className="remove-file-btn"
+                          >
+                            ✕
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+              <ToggleButtons tone={formData.tone} handleChange={handleChange}/>
+              <button
+                type="submit"
+                disabled={isSubmitting || (serviceType === 'Gmail' && !user)}
+                className="submit-btn"
+              >
+                {user ? (isSubmitting ? 'Generating...' : 'Generate Email') :'Please log in first'}
+              </button>
           </form>
           <EmailResponse
             responseHistory={responseHistory}

@@ -14,17 +14,20 @@ const EmailResponse = ({ responseHistory, setResponseHistory, promptHistory, set
     setIsSending(true);
 
     try {
-      let endpoint = 'send-thirdparty'
+      let endpoint = 'send-third-party'
       if (serviceType === 'Gmail') endpoint = 'send-gmail' 
 
       const formData = new FormData();
       // Replace sender with user.email for FormData
       const emailData = { ...email };
-      if (user?.email) {
-        emailData.sender = user.email;
-        emailData.senderName = user.given_name;
-      }
+      // if (serviceType === 'Gmail' && user?.email) {
+      //   emailData.sender = user.email;
+      //   emailData.senderName = user.given_name;
+      // } else {
+      //   emailData.sender = 
+      // }
       
+      console.log('sender: ', email.sender);
       for (const [key, value] of Object.entries(emailData)) {
         if (value !== null && value !== undefined) {
           formData.append(key, value);
