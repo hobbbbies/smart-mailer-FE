@@ -128,20 +128,20 @@ function App() {
     }
   }
 
-  if (serviceType != 'Gmail') {
-    return (
-      <main>
-        <div className='main-container'>
-          <AccountToggle serviceType={serviceType} setServiceType={setServiceType}/>
-          <div className='container'>
-            <h2>Coming soon!</h2>
-            <p>It's hard to find an SMPT provider that offers a good free tier... Difficult to justify 15$ a month unless I get real users.</p>
-            <p>Until then, Enjoy the gmail service! I promise I'm not going to maliciously use your gmail credentials.</p>
-          </div>
-        </div>
-      </main>
-    )
-  }
+  // if (serviceType != 'Gmail') {
+  //   return (
+  //     <main>
+  //       <div className='main-container'>
+  //         <AccountToggle serviceType={serviceType} setServiceType={setServiceType}/>
+  //         <div className='container'>
+  //           <h2>Coming soon!</h2>
+  //           <p>It's hard to find an SMPT provider that offers a good free tier... Difficult to justify 15$ a month unless I get real users.</p>
+  //           <p>Until then, Enjoy the gmail service! I promise I'm not going to maliciously use your gmail credentials.</p>
+  //         </div>
+  //       </div>
+  //     </main>
+  //   )
+  // }
 
 
   return (
