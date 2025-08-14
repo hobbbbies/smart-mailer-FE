@@ -146,6 +146,7 @@ textarea {
   cursor: pointer;
   transition: all 0.3s ease;
   margin-top: 1rem;
+  margin-bottom: 1rem;
 }
 
 .submit-btn:hover:not(:disabled) {

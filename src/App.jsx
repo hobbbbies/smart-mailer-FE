@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import './App.css'
 import EmailResponse from './components/EmailResponse'
 import ToggleButtons from './components/ToggleButtons'
-import { useSearchParams } from 'react-router-dom'
+import { useSearchParams, Link } from 'react-router-dom'
 import Google from './components/Google/Google'
 import AccountToggle from './components/AccountToggle'
 import { UserProvider } from './contexts/UserContext'
@@ -294,6 +294,10 @@ function App() {
             setAttachments={setAttachments}
             setFormData={setFormData}
           />
+          {/* Privacy policy link */}
+          <div className="privacy-link">
+            <Link to="/privacy">Privacy Policy</Link>
+          </div>
         </div>
       </div>
     </main>

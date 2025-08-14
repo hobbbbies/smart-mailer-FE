@@ -3,11 +3,16 @@ import { createRoot } from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import './index.css'
 import App from './App.jsx'
+import PrivacyPolicy from './PrivacyPolicy.jsx'
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
+  },
+  {
+    path: "/privacy",
+    element: <PrivacyPolicy />,
   },
 ])
 
