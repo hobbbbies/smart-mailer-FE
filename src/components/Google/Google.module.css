@@ -101,3 +101,8 @@
   background-color: #303030;
   opacity: 8%;
 }
+
+.google {
+    padding-bottom: 30px;;
+    border-bottom: 1px solid black;
+}

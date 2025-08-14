@@ -17,7 +17,7 @@ export default function Google({ user, setUser, denied }) {
     }
 
     return (
-        <div className="google">
+        <div className={styles.google}>
           {/* Render only when not logged in */}
           {!user && (
             <button className={styles['gsi-material-button']} onClick={handleOAuth}>
@@ -47,8 +47,15 @@ export default function Google({ user, setUser, denied }) {
           {user && <div className="user-info">
             <button onClick={handleLogout}>Log Out</button>
             <div>Logged in as: <b>{user.email}</b></div>
-            <div className="warning">NOTE: Emails will be sent on your behalf</div>
           </div>}
+        <div className="warning">
+          Smart Mailer will have access to:
+          <ul>
+            <li>Send emails on your behalf</li>
+            <li>View your basic profile info and email address</li>
+          </ul>
+          This access is used only to send emails you request.<br />
+        </div>
         </div>
     )
 }
