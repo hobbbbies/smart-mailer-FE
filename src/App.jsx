@@ -159,6 +159,9 @@ function App() {
             {/* <button onClick={handleOauth}>Log In with google</button> */}
             {serviceType==="Gmail" ? <Google user={user} setUser={setUser} denied={denied} /> : <div><i>Emails will be sent through a third party domain<br></br> <strong>NOTE: Third party emails are currently demo mode - only emails to stefankkvitanov@gmail.com will work</strong>. </i></div>}
             <h1>Smart Mailer</h1>
+            <div className="app-description">
+              <p>Generate professional, personalized emails using AI and send them {serviceType === 'Gmail' ? 'directly from your Gmail account' : 'from a third party domain'}. Simply describe what you want to say, choose your tone, and let Smart Mailer craft the perfect message for you.</p>
+            </div>
             <form onSubmit={handleSubmit} className="email-form">
              {serviceType !== 'Gmail' && (
                <>
