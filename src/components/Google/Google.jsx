@@ -48,13 +48,8 @@ export default function Google({ user, setUser, denied }) {
             <button onClick={handleLogout}>Log Out</button>
             <div>Logged in as: <b>{user.email}</b></div>
           </div>}
-        <div className="warning">
-          Smart Mailer will have access to:
-          <ul>
-            <li>Send emails on your behalf</li>
-            <li>View your basic profile info and email address</li>
-          </ul>
-          This access is used only to send emails you request.<br />
+        <div className={styles.warning}>
+          Smart Mailer will send emails on <i>your behalf</i>
         </div>
         </div>
     )

@@ -102,7 +102,7 @@
   opacity: 8%;
 }
 
-.google {
-    padding-bottom: 30px;;
-    border-bottom: 1px solid black;
+.warning {
+  color: red;
+  margin-top: 12px;
 }
