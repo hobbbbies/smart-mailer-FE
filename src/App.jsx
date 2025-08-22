@@ -154,14 +154,39 @@ function App() {
     <UserProvider user={user}>
       <main>
         <div className="main-container">
+          {/* Purpose and Google Data Usage Notice */}
+          <section style={{
+            background: 'var(--primary-color)',
+            color: 'var(--cream)',
+            borderRadius: '8px',
+            padding: '1.5rem 2rem',
+            margin: '2rem 0 2.5rem 0',
+            border: '2px solid var(--deep-navy)',
+            boxShadow: '0 4px 16px rgba(18,52,88,0.10)',
+            textAlign: 'left',
+            fontSize: '1.1rem',
+            lineHeight: 1.7
+          }}>
+            <h2 style={{color: 'var(--cream)', marginTop: 0, marginBottom: '0.5rem', fontWeight: 700, fontSize: '1.5rem'}}>What is Smart Mailer?</h2>
+            <p style={{margin: 0}}>
+              <strong>Smart Mailer</strong> is an AI-powered tool that helps you generate and send professional, personalized emails with ease. Simply describe what you want to say, choose your tone, and let Smart Mailer craft the perfect message for you.
+            </p>
+            <h3 style={{color: 'var(--warm-beige)', margin: '1.2rem 0 0.5rem 0', fontWeight: 600, fontSize: '1.1rem'}}>Why does Smart Mailer need Google data?</h3>
+            <ul style={{color: 'var(--cream)', margin: 0, paddingLeft: '1.2em', fontSize: '1rem'}}>
+              <li>To send emails directly from <strong>your Gmail account</strong> (with your permission).</li>
+              <li>To display your name and email in the app interface.</li>
+              <li><strong>Smart Mailer does NOT read, store, or access the content of your emails.</strong></li>
+              <li>You can revoke access at any time in your Google Account settings.</li>
+            </ul>
+            <p style={{marginTop: '1rem', fontSize: '0.98rem', color: 'var(--warm-beige)'}}>
+              Your privacy is important. For more details, see our <a href="/privacy" style={{color: 'var(--warm-beige)', textDecoration: 'underline'}}>Privacy Policy</a>.
+            </p>
+          </section>
           <AccountToggle serviceType={serviceType} setServiceType={setServiceType}/>
           <div className="container">
             {/* <button onClick={handleOauth}>Log In with google</button> */}
             {serviceType==="Gmail" ? <Google user={user} setUser={setUser} denied={denied} /> : <div><i>Emails will be sent through a third party domain<br></br> <strong>NOTE: Third party emails are currently demo mode - only emails to stefankkvitanov@gmail.com will work</strong>. </i></div>}
             <h1>Smart Mailer</h1>
-            <div className="app-description">
-              <p>With Smart Mailer, generate professional, personalized emails using AI and send them {serviceType === 'Gmail' ? 'directly from your Gmail account' : 'from a third party domain'}. Simply describe what you want to say, choose your tone, and let Smart Mailer craft and send the perfect message for you.</p>
-            </div>
             <form onSubmit={handleSubmit} className="email-form">
              {serviceType !== 'Gmail' && (
                <>
